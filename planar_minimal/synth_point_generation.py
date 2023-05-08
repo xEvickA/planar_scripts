@@ -90,7 +90,7 @@ def generate_synth_pcs(num_pts, num_planes=10, shuffle=0.0, major_plane=0.0, sig
 
     rot_vec = motion_n * 10 * np.random.randn()
     rotation = Rotation.from_rotvec(rot_vec)
-    R = rotation.as_dcm()
+    R = rotation.as_matrix()
 
     # print("zeros")
     # print((skew_symmetric(t) @ R - R.T @ skew_symmetric(t)) @ (t - R.T @ t))
