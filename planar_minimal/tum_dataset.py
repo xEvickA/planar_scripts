@@ -74,12 +74,12 @@ def find_closest(timestamp, stamp_array, return_idx=False):
     return stamp_array[idx]
 
 
-def extract_planar_dir(dir, tol=0.01):
+def extract_planar_dir(dir, tol=0.01, theta=0):
     gt_data,  img_stamps, img_dict = load_data(dir)
 
     Ts = [transform44(l) for l in gt_data]
 
-    out_path = os.path.join(dir, 'planar.txt')
+    out_path = os.path.join(dir, f'planar{theta}.txt')
 
     i_start = find_closest(img_stamps[0], gt_data[:, 0], return_idx=True)
     i_end = find_closest(img_stamps[-1], gt_data[:, 0], return_idx=True)
@@ -104,7 +104,7 @@ def extract_planar_dir(dir, tol=0.01):
             a = angle(t_d, r_d.as_rotvec())
             # a = 0
 
-            if 90.0 - tol < a < 90.0 + tol:
+            if 90.0 - theta - tol < a < 90.0 - theta + tol or 90.0 + theta - tol < a < 90.0 + theta + tol:
                 gt_timestamp_i = gt_data[i, 0]
                 gt_timestamp_j = gt_data[j, 0]
 
