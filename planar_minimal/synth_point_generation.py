@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.spatial.transform import Rotation
-from utils import skew_symmetric
+from planar_minimal.utils import skew_symmetric
 
 
 def get_random_n():
@@ -70,7 +70,27 @@ def get_affine_correspondences(p1, p2, H):
     return A
 
 
-def generate_synth_pcs(num_pts, num_planes=10, shuffle=0.0, major_plane=0.0, sigma_pix=0.5, focal=300, width=640, height=480, px=320, py=240):
+def get_random_t_R(theta, focal):
+    u = np.random.rand(3) - 0.5
+    u /= np.linalg.norm(u)
+    R = Rotation.from_rotvec(u * 10 * np.random.randn()).as_matrix()
+
+    p1 = np.array([u[1], -u[0], 0])
+    p1 /= np.linalg.norm(p1)
+    p2 = np.cross(u, p1)
+
+    t = focal / 2 * np.random.randn() * p1 + focal / 2 * np.random.randn() * p2
+
+    pt = np.cross(t, u)
+    pt = np.deg2rad(theta) * pt / np.linalg.norm(pt)
+    R_angle = Rotation.from_rotvec(pt).as_matrix()
+
+    t = R_angle @ t
+
+    return R, t
+
+
+def generate_synth_pcs(num_pts, theta=90.0, num_planes=10, shuffle=0.0, major_plane=0.0, sigma_pix=0.5, focal=300, width=640, height=480, px=320, py=240):
     # init random intrinsics if they are not set
     if focal is None:
         focal = 100 + np.random.rand() * 10
@@ -86,11 +106,8 @@ def generate_synth_pcs(num_pts, num_planes=10, shuffle=0.0, major_plane=0.0, sig
 
     motion_n, motion_np1, motion_np2 = get_random_n()
 
-    t = focal / 2 * np.random.randn() * motion_np1 + focal / 2 * np.random.randn() * motion_np2
-
-    rot_vec = motion_n * 10 * np.random.randn()
-    rotation = Rotation.from_rotvec(rot_vec)
-    R = rotation.as_matrix()
+    R, t = get_random_t_R(theta, focal)
+    rotation = Rotation.from_matrix(R)
 
     # print("zeros")
     # print((skew_symmetric(t) @ R - R.T @ skew_symmetric(t)) @ (t - R.T @ t))
