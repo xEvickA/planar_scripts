@@ -152,11 +152,11 @@ def generate_synth_pcs(num_pts, theta=90.0, num_planes=10, shuffle=0.0, major_pl
     A = get_affine_correspondences(p1, p2, H)
 
     if shuffle > 0.0:
-        num_shuffle = int(np.round(num_pts * 0.5))
+        num_shuffle = int(np.round(num_pts * shuffle))
 
-        idxs_shuffle = np.random.choice(300, num_shuffle)
+        idxs_shuffle = np.random.choice(num_pts, num_shuffle, replace=False)
 
         p2[idxs_shuffle] = np.random.rand(num_shuffle, 2) * np.array([[width, height]])
-        A[idxs_shuffle] = np.random.rand(num_shuffle, 2, 2)
+        #A[idxs_shuffle] = np.random.rand(num_shuffle, 2, 2)
 
     return p1, p2, A, F, K, t, R
