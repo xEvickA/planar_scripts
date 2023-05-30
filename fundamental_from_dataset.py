@@ -100,8 +100,8 @@ count = 0
 
 
 def calcul_for_dataset(diff):
-   if diff == 0:
-      diff = ''
+   if not exists(f"dataset/planar{error}.txt"):
+      tum_dataset.extract_planar_dir("dataset", 0.01, diff=error)
    num_of_lines = get_num_of_lines(f"dataset/planar{diff}.txt")
    matches = []
    for i in range(num_of_lines):
@@ -143,6 +143,4 @@ def calcul_for_dataset(diff):
          continue
 
 if __name__ == '__main__':
-   if not exists("dataset/planar0.txt"):
-      tum_dataset.extract_planar_dir("dataset", 0.01, 0)
    calcul_for_dataset(0)
