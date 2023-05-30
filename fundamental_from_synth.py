@@ -14,9 +14,10 @@ def write_error(file_name, R, t, Rpt, tpt, time, inliers, outliers):
       line = ('{},' * 4 + '{} \n').format(alpha, beta, time, inliers, outliers)
       err.write(line)
 
-def synth(points, theta):
+def synth(points, theta, garbage):
+    if garbage > 1: garbage /= 100
     ransac = dict()
-    p1, p2, A, F, K, t, R = generate_synth_pcs(points, theta)
+    p1, p2, A, F, K, t, R = generate_synth_pcs(points, theta, shuffle=garbage, sigma_pix=0.0, num_planes=0)
 
     start = time.time()
     F1, mask1 = poselib.estimate_planar_fundamental_6pt(p1, p2, ransac, dict(), True)
@@ -35,13 +36,11 @@ def synth(points, theta):
     R6ptF, t6ptF = Rt_from_fundamental(F2)
     R7ptT, t7ptT = Rt_from_fundamental(F3)
     R7ptF, t7ptF = Rt_from_fundamental(F4)
-    write_error(f"synth_error6ptT{theta}.txt", R, t, R6ptT, t6ptT, time1, mask1['inliers'].count(True), points)
-    write_error(f"synth_error6ptF{theta}.txt", R, t, R6ptF, t6ptF, time2, mask2['inliers'].count(True), points)
-    write_error(f"synth_error7ptT{theta}.txt", R, t, R7ptT, t7ptT, time3, mask3['inliers'].count(True), points)
-    write_error(f"synth_error7ptF{theta}.txt", R, t, R7ptF, t7ptF, time4, mask4['inliers'].count(True), points)
+    write_error(f"synth_error6ptT{theta}_{garbage}.txt", R, t, R6ptT, t6ptT, time1, mask1['inliers'].count(True), points)
+    write_error(f"synth_error6ptF{theta}_{garbage}.txt", R, t, R6ptF, t6ptF, time2, mask2['inliers'].count(True), points)
+    write_error(f"synth_error7ptT{theta}_{garbage}.txt", R, t, R7ptT, t7ptT, time3, mask3['inliers'].count(True), points)
+    write_error(f"synth_error7ptF{theta}_{garbage}.txt", R, t, R7ptF, t7ptF, time4, mask4['inliers'].count(True), points)
 
 
 if __name__ == '__main__':
-    for j in range(0, 36, 5):
-        for i in range(300):    
-            synth(500, j)
+   synth(300, 0, 0)
